@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AKSHPAR MEMORIES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f5;--ink:#14213d;--muted:#5b6577;--accent:#2b4bff;--card:#fff;--line:#d5dbe5}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 15% 10%,#dfe8ff 0,transparent 45%),radial-gradient(circle at 90% 70%,#e3f3ff 0,transparent 40%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:28px 18px 80px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+h1{font-size:clamp(2.2rem,7vw,4.4rem);line-height:.98;margin:0;font-weight:800;letter-spacing:-.02em;animation:float 7s ease-in-out infinite}
+.sub{color:var(--muted);margin:10px 0 0}
+button,.btn{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 16px}
+button:hover,.btn:hover{border-color:var(--ink)}
+.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.primary:hover{border-color:var(--ink);background:#1f3be0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.tab[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.spacer{flex:1}
+.owner{display:none;gap:8px;align-items:center}
+body.is-owner .owner{display:flex}
+#status{color:var(--muted);font-size:.9rem}
+.grid{columns:3 260px;column-gap:12px}
+.item{break-inside:avoid;margin:0 0 18px;position:relative;background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 16px 32px rgba(20,33,61,.16);animation:float var(--d,6s) ease-in-out var(--dl,0s) infinite}
+.item:hover{animation-play-state:paused}
+@keyframes float{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-9px) rotate(calc(var(--r,0deg) * -1))}}
+.bar,.sub{animation:float 8s ease-in-out infinite}
+.item img,.item video{width:100%;display:block;cursor:zoom-in;background:#dfe4ec}
+.item video{cursor:auto}
+.del{position:absolute;top:8px;right:8px;padding:5px 10px;font-size:.85rem;display:none;background:rgba(255,255,255,.95)}
+body.is-owner .del{display:block}
+.empty{padding:60px 20px;text-align:center;color:var(--muted);border:2px dashed var(--line);border-radius:14px}
+dialog{border:0;border-radius:14px;padding:22px;max-width:92vw}
+dialog::backdrop{background:rgba(20,33,61,.7)}
+#login label{display:block;margin:12px 0 4px;font-weight:600}
+#login input{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit}
+#login .row{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+#err{color:#b3261e;min-height:1.4em;margin:10px 0 0}
+#lb{background:transparent;padding:0}
+#lb img{max-width:92vw;max-height:88vh;display:block;border-radius:10px}
+.locked{overflow:hidden}
+#welcome{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;background:radial-gradient(circle at 20% 15%,#dfe8ff 0,transparent 50%),radial-gradient(circle at 85% 80%,#d9efff 0,transparent 45%),#eef1f5}
+.note{max-width:580px;background:var(--card);border-radius:20px;padding:34px 30px;box-shadow:0 24px 60px rgba(20,33,61,.22);text-align:center;animation:float 7s ease-in-out infinite}
+.note h2{margin:0 0 14px;font-size:1.5rem;font-weight:800;letter-spacing:-.01em}
+.note p{margin:0 0 24px;font-size:1.12rem;line-height:1.75}
+.note button{font-size:1.05rem;padding:11px 34px}
+#mute{position:fixed;right:16px;bottom:16px;z-index:10000;box-shadow:0 8px 20px rgba(20,33,61,.18)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body class="locked">
+<div class="wrap">
+  <header>
+    <div>
+      <h1>AKSHPAR<br>MEMORIES</h1>
+      <p class="sub" id="count">Loading…</p>
+    </div>
+    <div>
+      <button id="loginBtn">Owner login</button>
+      <button id="logoutBtn" hidden>Log out</button>
+    </div>
+  </header>
+
+  <div class="bar">
+    <button class="tab" data-f="all" aria-pressed="true">All</button>
+    <button class="tab" data-f="photo" aria-pressed="false">Photos</button>
+    <button class="tab" data-f="video" aria-pressed="false">Videos</button>
+    <span class="spacer"></span>
+    <div class="owner">
+      <span id="status"></span>
+      <label class="btn primary" for="file">Add photos or videos</label>
+      <input id="file" type="file" accept="image/*,video/*" multiple hidden>
+    </div>
+  </div>
+
+  <main id="grid" class="grid" aria-live="polite"></main>
+</div>
+
+<div id="welcome" role="dialog" aria-modal="true" aria-labelledby="wt">
+  <div class="note">
+    <h2 id="wt">A note before you enter</h2>
+    <p>Life has given me a little bit of everything—laughter, love, tough days, and every emotion in between. Through every high and every low, the one constant I will always be grateful for is my friends. Thank you for always being my safe space, my biggest cheerleaders, and my favorite people to share this journey with. I love you guys so much!</p>
+    <button class="primary" id="enter">Enter</button>
+  </div>
+</div>
+<audio id="bgm" src="yaaro.mp3" loop preload="auto"></audio>
+<button id="mute" aria-label="Mute music" hidden>Music on</button>
+
+<dialog id="login">
+  <form method="dialog" id="loginForm">
+    <h2 style="margin:0">Owner login</h2>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="username" required>
+    <label for="pw">Password</label>
+    <input id="pw" type="password" autocomplete="current-password" required>
+    <p id="err" role="alert"></p>
+    <div class="row">
+      <button type="button" id="cancel">Cancel</button>
+      <button class="primary" id="submit" type="submit">Log in</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="lb"><img id="lbImg" alt=""></dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL = "https://qwiycssewlaudqgdteic.supabase.co";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3aXljc3Nld2xhdWRxZ2R0ZWljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MzQzMzMsImV4cCI6MjExMTExMDMzM30.GSOsZWbSoi8WRZKnPVQJX--htXCubKaqx19XW39wxO4";
+const BUCKET = "memories";
+const MAX_MB = 50; // Supabase free plan limit per file
+
+const sb = window.supabase.createClient(SUPABASE_URL, ANON_KEY);
+const store = sb.storage.from(BUCKET);
+const $ = id => document.getElementById(id);
+let items = [], filter = "all";
+
+const VIDEO = /\.(mp4|mov|webm|m4v|ogv)$/i;
+const IMAGE = /\.(jpe?g|png|gif|webp|avif|heic|bmp)$/i;
+const kind = n => VIDEO.test(n) ? "video" : IMAGE.test(n) ? "photo" : null;
+
+async function load() {
+  const { data, error } = await store.list("", { limit: 1000, sortBy: { column: "created_at", order: "desc" } });
+  if (error) { $("count").textContent = "Could not load memories: " + error.message; return; }
+  items = data.filter(f => f.name && kind(f.name)).map(f => ({ name: f.name, type: kind(f.name), url: store.getPublicUrl(f.name).data.publicUrl }));
+  render();
+}
+
+function render() {
+  const p = items.filter(i => i.type === "photo").length, v = items.length - p;
+  $("count").textContent = items.length ? `${p} photo${p === 1 ? "" : "s"}, ${v} video${v === 1 ? "" : "s"}` : "Nothing here yet";
+  const grid = $("grid"); grid.textContent = "";
+  const shown = items.filter(i => filter === "all" || i.type === filter);
+  if (!shown.length) {
+    const d = document.createElement("div"); d.className = "empty";
+    d.textContent = document.body.classList.contains("is-owner") ? "No memories yet. Use “Add photos or videos” to upload your first one." : "No memories to show yet.";
+    grid.style.columns = "1"; grid.appendChild(d); return;
+  }
+  grid.style.columns = "";
+  for (const it of shown) {
+    const box = document.createElement("div"); box.className = "item";
+    box.style.setProperty("--d", (5 + Math.random() * 3).toFixed(1) + "s");
+    box.style.setProperty("--dl", "-" + (Math.random() * 6).toFixed(1) + "s");
+    box.style.setProperty("--r", ((Math.random() - 0.5) * 1.2).toFixed(2) + "deg");
+    let el;
+    if (it.type === "photo") {
+      el = document.createElement("img"); el.src = it.url; el.loading = "lazy"; el.alt = "Photo";
+      el.addEventListener("click", () => { $("lbImg").src = it.url; $("lb").showModal(); });
+    } else {
+      el = document.createElement("video"); el.src = it.url; el.controls = true; el.preload = "metadata"; el.playsInline = true;
+    }
+    const del = document.createElement("button"); del.className = "del"; del.textContent = "Delete";
+    del.addEventListener("click", () => removeItem(it));
+    box.append(el, del); grid.appendChild(box);
+  }
+}
+
+async function removeItem(it) {
+  if (!confirm("Delete this memory forever?")) return;
+  const { error } = await store.remove([it.name]);
+  if (error) { alert("Delete failed: " + error.message); return; }
+  items = items.filter(x => x !== it); render();
+}
+
+$("file").addEventListener("change", async e => {
+  const files = [...e.target.files]; let done = 0, failed = 0;
+  for (const f of files) {
+    $("status").textContent = `Uploading ${done + failed + 1} of ${files.length}…`;
+    if (f.size > MAX_MB * 1024 * 1024) { failed++; alert(`${f.name} is over ${MAX_MB} MB, so it was skipped.`); continue; }
+    const name = `${Date.now()}-${done}-${f.name.replace(/[^\w.\-]+/g, "_")}`;
+    const { error } = await store.upload(name, f, { contentType: f.type, cacheControl: "31536000" });
+    if (error) { failed++; alert(`Could not upload ${f.name}: ${error.message}`); } else done++;
+  }
+  $("status").textContent = `Uploaded ${done}${failed ? `, ${failed} failed` : ""}.`;
+  e.target.value = ""; await load();
+});
+
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => {
+  filter = b.dataset.f;
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-pressed", t === b));
+  render();
+}));
+
+// Login
+$("loginBtn").onclick = () => { $("err").textContent = ""; $("login").showModal(); $("email").focus(); };
+$("cancel").onclick = () => $("login").close();
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("submit").disabled = true; $("err").textContent = "";
+  const { error } = await sb.auth.signInWithPassword({ email: $("email").value, password: $("pw").value });
+  $("submit").disabled = false;
+  if (error) { $("err").textContent = "Login failed. Check your email and password."; return; }
+  $("pw").value = ""; $("login").close();
+});
+$("logoutBtn").onclick = () => sb.auth.signOut();
+$("lb").addEventListener("click", () => $("lb").close());
+
+function setOwner(session) {
+  document.body.classList.toggle("is-owner", !!session);
+  $("loginBtn").hidden = !!session; $("logoutBtn").hidden = !session;
+  render();
+}
+sb.auth.onAuthStateChange((_e, session) => setOwner(session));
+load();
+
+// Welcome note + background music
+const bgm = $("bgm"); bgm.volume = 0.18;
+$("enter").addEventListener("click", () => {
+  $("welcome").remove(); document.body.classList.remove("locked");
+  bgm.play().then(() => { $("mute").hidden = false; }).catch(() => {});
+});
+$("mute").addEventListener("click", () => {
+  bgm.muted = !bgm.muted;
+  $("mute").textContent = bgm.muted ? "Music off" : "Music on";
+  $("mute").setAttribute("aria-label", bgm.muted ? "Unmute music" : "Mute music");
+});
+
+// Bubble cursor trail
+(function () {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElement("canvas");
+  Object.assign(c.style, { position: "fixed", top: "0", left: "0", pointerEvents: "none", zIndex: "10001" });
+  document.body.appendChild(c);
+  const ctx = c.getContext("2d"), parts = [];
+  const size = () => { c.width = innerWidth; c.height = innerHeight; };
+  size(); addEventListener("resize", size);
+
+  class Particle {
+    constructor(x, y) {
+      this.initial = Math.floor(Math.random() * 60 + 60); this.life = this.initial;
+      this.vx = (Math.random() < 0.5 ? -1 : 1) * (Math.random() / 10);
+      this.vy = -0.4 + Math.random() * -1;
+      this.x = x; this.y = y; this.base = 4;
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      this.vx += ((Math.random() < 0.5 ? -1 : 1) * 2) / 75;
+      this.vy -= Math.random() / 600;
+      this.life--;
+      const scale = 0.2 + (this.initial - this.life) / this.initial;
+      ctx.fillStyle = "#e6f1f7"; ctx.strokeStyle = "#3a92c5";
+      ctx.beginPath();
+      ctx.arc(this.x - (this.base / 2) * scale, this.y - this.base / 2, this.base * scale, 0, 2 * Math.PI);
+      ctx.stroke(); ctx.fill(); ctx.closePath();
+    }
+  }
+
+  const add = (x, y) => parts.push(new Particle(x, y));
+  document.addEventListener("mousemove", e => add(e.clientX, e.clientY));
+  const touch = e => { for (const t of e.touches) add(t.clientX, t.clientY); };
+  document.addEventListener("touchmove", touch, { passive: true });
+  document.addEventListener("touchstart", touch, { passive: true });
+
+  (function loop() {
+    if (parts.length) {
+      ctx.clearRect(0, 0, c.width, c.height);
+      parts.forEach(p => p.update());
+      for (let i = parts.length - 1; i >= 0; i--) if (parts[i].life < 0) parts.splice(i, 1);
+      if (!parts.length) ctx.clearRect(0, 0, c.width, c.height);
+    }
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>
